@@ -1,6 +1,7 @@
 const Router = require('koa-router')
 const router = new Router()
 const callCloudFn = require('../utils/callCloudFn')
+const callCloudDB = require('../utils/callCloudDB.js')
 
 
 /** router.get('/list', async(ctx, next) => {
@@ -51,6 +52,45 @@ router.get('/list', async (ctx, next) => {
     ctx.body = {
         data,
         code: 20000,
+    }
+})
+
+// 根据歌单id查询云数据库中的歌单信息, 直接通过 HTTP api 调用云数据库查询数据
+router.get('/getById', async(ctx, next)=>{
+    const query = `db.collection('playlist').doc('${ctx.request.query.id}').get()`
+    const res = await callCloudDB(ctx, 'databasequery', query)
+    ctx.body = {
+        code: 20000,
+        data: JSON.parse(res.data)
+    }
+})
+
+// 更新歌单列表数据
+router.post('/updatePlaylist', async(ctx, next)=>{
+    const params = ctx.request.body
+    const query = `
+        db.collection('playlist').doc('${params._id}').update({
+            data: {
+                name: '${params.name}',
+                copywriter: '${params.copywriter}'
+            }
+        })
+    `
+    const res = await callCloudDB(ctx, 'databaseupdate', query)
+    ctx.body = {
+        code: 20000,
+        data: res
+    }
+})
+
+// 删除歌单列表(单项删除)
+router.get('/del', async(ctx, next)=>{
+    const params = ctx.request.query
+    const query = `db.collection('playlist').doc('${params.id}').remove()`
+    const res = await callCloudDB(ctx, 'databasedelete', query)
+    ctx.body = {
+        code: 20000,
+        data: res
     }
 })
 
