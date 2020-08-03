@@ -5,8 +5,8 @@ const URL = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credentia
 
 const updateAccessToken = async () => {
   const resStr = await rp(URL)
-    const res = JSON.parse(resStr)
-    console.log(res)
+  const res = JSON.parse(resStr)
+  console.log(res)
 }
 
 updateAccessToken()
