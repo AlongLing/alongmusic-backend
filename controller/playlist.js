@@ -68,6 +68,7 @@ router.get('/getById', async(ctx, next)=>{
 // 更新歌单列表数据
 router.post('/updatePlaylist', async(ctx, next)=>{
     const params = ctx.request.body
+    console.log(params)
     const query = `
         db.collection('playlist').doc('${params._id}').update({
             data: {
