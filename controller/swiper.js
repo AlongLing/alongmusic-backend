@@ -8,6 +8,7 @@ router.get('/list', async (ctx, next) => {
     const query = `db.collection('swiper').get()`
     const res = await callCloudDB(ctx, 'databasequery', query)
     console.log(res)
+    // 文件下载链接
     let fileList = []
     const data = res.data
     for (let i = 0, len = data.length; i < len; i++) {
@@ -30,6 +31,24 @@ router.get('/list', async (ctx, next) => {
         code: 20000,
         data: returnData
     }
+})
+
+router.post('/upload', async(ctx, next) => {
+    const fileid =  await cloudStorage.upload(ctx)
+    console.log(`fileid = ${fileid}`)
+    // 写数据库
+    const query = `
+        db.collection('swiper').add({
+            data: {
+                fileid: '${fileid}'
+            }
+        })
+    `
+   const res = await callCloudDB(ctx, 'databaseadd', query)
+   ctx.body = {
+       code: 20000,
+       id_list: res.id_list
+   }
 })
 
 module.exports = router
