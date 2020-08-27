@@ -51,4 +51,22 @@ router.post('/upload', async(ctx, next) => {
    }
 })
 
+// 删除轮播图片 , 需要同时删除数据库中的记录和云存储中的图片
+router.get('/del', async (ctx, next) => {
+    const params = ctx.request.query
+    // 删除云数据库中的内容
+    const query = `db.collection('swiper').doc('${params._id}').remove()`
+    const delDBRes = await callCloudDB(ctx, 'databasedelete', query)
+
+    // 删除云存储中的文件
+    const delStorageRes = await cloudStorage.delete(ctx, [params.fileid])
+    ctx.body = {
+        code: 20000,
+        data: {
+            delDBRes,
+            delStorageRes,
+        }
+    }
+})
+
 module.exports = router
